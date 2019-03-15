@@ -1,0 +1,34 @@
+library(ggplot2)
+library(ggmap)
+library(rworldmap)
+
+# using google map API
+devtools::install_github("dkahle/ggmap", force = TRUE)
+library(ggmap)
+register_google(key = "AIzaSyD5_hYz68IcGCKm38djuA-NplA7ERLObrI")
+# check if key is saved
+has_goog_key()
+
+# show the map of paris
+center <- get_map(location = 'paris',
+               zoom = 12,
+               maptype = "terrain",
+              source = "google",
+              messaging = TRUE)
+ggmap(center)
+
+# show the location of stores
+cols <- c("brand_A"="black","brand_B"="red")
+ggmap(center)+
+  scale_colour_manual(name="Brand",values=cols)+
+  geom_point(aes(x=lon, y=lat, color='brand_A', size=count), data = dataA, alpha=0.8) +
+  geom_point(aes(x=lon, y=lat, color='brand_B', size=count), data = dataB, alpha=0.8) + 
+  coord_fixed(xlim = c(min(fre_visting_all$lon), max(fre_visting_all$lon)), ylim = c(48.80, 48.93))
+
+# plot movements and highlight two specific users
+ggmap(center)+
+  geom_point(aes(x=lon, y=lat, colour = userID, size=Freq), data = all, alpha=0.8) +
+  scale_color_brewer(palette = "Set1")+
+  geom_point(aes(x=lon, y=lat, size=Freq), data = counts_a, alpha=0.8, color='blue') +
+  geom_point(aes(x=lon, y=lat, size=Freq), data = counts_b, alpha=0.8, color='yellow') +
+  scale_size_continuous(name = "frequency of visit") 
